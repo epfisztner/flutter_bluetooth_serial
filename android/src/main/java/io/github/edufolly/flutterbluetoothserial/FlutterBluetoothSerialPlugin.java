@@ -319,7 +319,7 @@ public class FlutterBluetoothSerialPlugin implements FlutterPlugin, ActivityAwar
         messenger = binding.getBinaryMessenger();
 
         methodChannel = new MethodChannel(messenger, PLUGIN_NAMESPACE + "/methods");
-        methodChannel.setMethodCallHandler( new FlutterBluetoothSerialMethodCallHandler() );
+        methodChannel.setMethodCallHandler(new FlutterBluetoothSerialMethodCallHandler());
 
         EventChannel stateChannel = new EventChannel(messenger, PLUGIN_NAMESPACE + "/state");
 
@@ -444,20 +444,26 @@ public class FlutterBluetoothSerialPlugin implements FlutterPlugin, ActivityAwar
     EnsurePermissionsCallback pendingPermissionsEnsureCallbacks = null;
 
     private void ensurePermissions(EnsurePermissionsCallback callbacks) {
-        if (
-                ContextCompat.checkSelfPermission(activity,
-                        Manifest.permission.ACCESS_COARSE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED
-                        || ContextCompat.checkSelfPermission(activity,
-                        Manifest.permission.ACCESS_FINE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity,
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQUEST_COARSE_LOCATION_PERMISSIONS);
+        try {
+            if (callbacks != null) {
+                if (
+                        ContextCompat.checkSelfPermission(activity,
+                                Manifest.permission.ACCESS_COARSE_LOCATION)
+                                != PackageManager.PERMISSION_GRANTED
+                                || ContextCompat.checkSelfPermission(activity,
+                                Manifest.permission.ACCESS_FINE_LOCATION)
+                                != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(activity,
+                            new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
+                            REQUEST_COARSE_LOCATION_PERMISSIONS);
 
-            pendingPermissionsEnsureCallbacks = callbacks;
-        } else {
-            callbacks.onResult(true);
+                    pendingPermissionsEnsureCallbacks = callbacks;
+                } else {
+                    callbacks.onResult(true);
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
         }
     }
 
